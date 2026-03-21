@@ -1,6 +1,6 @@
 # baseutils
 
-A minimal and simple C utility library with helper functions.
+A minimal and simple C utility library.
 
 ## Library
 
