@@ -3,6 +3,10 @@
 
 typedef enum {
     ERR_NONE = 0,
+    ERR_UNKNOWN,
+    ERR_NOT_IMPLEMENTED,
+    ERR_OUT_OF_BOUNDS,
+    ERR_NULL,
 } ErrorType;
 
 typedef struct {
@@ -19,11 +23,15 @@ typedef struct {
     };
 } Result;
 
-#define SUCCESS(data)                                                          \
-    (Result) { .status = RESULT_SUCCESS, .data = data }
+#define ERROR(type, msg, exit_code)                                            \
+    (Error) { type, msg, exit_code }
 
-#define FAILURE(error)                                                         \
-    (Result) { .status = RESULT_FAILURE, .error = error }
+#define NO_ERROR ERROR(ERR_NONE, NULL, 0)
+#define SUCCESS(_data)                                                         \
+    (Result) { RESULT_SUCCESS, .data = _data }
+
+#define FAILURE(type, msg, exit_code)                                          \
+    (Result) { RESULT_FAILURE, .error = ERROR(type, msg, exit_code) }
 
 #define TRY(result)                                                            \
     do {                                                                       \
@@ -33,13 +41,30 @@ typedef struct {
         }                                                                      \
     } while (0)
 
-#define TRY_UNPACK(data, result)                                               \
+#define TRY_UNPACK(_data, _result)                                             \
     do {                                                                       \
-        Result res = (result);                                                 \
+        Result res = (_result);                                                \
         if (res.status == RESULT_FAILURE) {                                    \
             return res;                                                        \
         }                                                                      \
-        data = res.data;                                                       \
+        _data = res.data;                                                      \
+    } while (0)
+
+#define TRY_UNPACK_ERR(_data, _result)                                         \
+    do {                                                                       \
+        Result res = (_result);                                                \
+        if (res.status == RESULT_FAILURE) {                                    \
+            return res.error;                                                  \
+        }                                                                      \
+        _data = res.data;                                                      \
+    } while (0)
+
+#define CHECK_ERR(error)                                                       \
+    do {                                                                       \
+        Error err = (error);                                                   \
+        if (err.type != ERR_NONE) {                                            \
+            return err;                                                        \
+        }                                                                      \
     } while (0)
 
 #endif

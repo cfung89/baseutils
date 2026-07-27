@@ -2,6 +2,7 @@
 #define BASEUTILS_ARENA_H
 
 #include <stdint.h>
+#include "array.h"
 
 typedef uint8_t u8;
 typedef uint32_t u32;
@@ -44,7 +45,13 @@ void arena_clear(Arena *arena);
 ArenaMarker arena_snapshot(Arena *arena);
 void arena_pop(Arena *arena, ArenaMarker marker);
 
-#define arena_push_struct(arena, type, set_zero) (type *)arena_push(arena, sizeof(type), set_zero)
-#define arena_push_array(arena, type, count, set_zero) (type *)arena_push(arena, sizeof(type) * (count), set_zero)
+#define arena_push_struct(arena, type, set_zero)                               \
+    (type *)arena_push(arena, sizeof(type), set_zero)
+
+#define arena_push_array(arena, type, length, set_zero)                         \
+    (type *)arena_push(arena, sizeof(type) * (length), set_zero)
+
+#define arena_create_array(arena, type, length, set_zero)                                 \
+    array_create(arena_push_array(arena, type, length, set_zero), length, sizeof(type))
 
 #endif

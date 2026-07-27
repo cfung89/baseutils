@@ -1,6 +1,7 @@
 #ifndef BASEUTILS_STRINGVIEW_H
 #define BASEUTILS_STRINGVIEW_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -13,7 +14,7 @@ typedef struct {
     size_t length;
 } StringView;
 
-StringView sv_new(const char *str);
+StringView sv_create(const char *str);
 void sv_to_string(const StringView *self, char *output);
 void sv_print(const StringView *self);
 void sv_chop_left(StringView *self, size_t n);
@@ -25,5 +26,9 @@ StringView sv_chop_by_delim(StringView *self, char delim);
 StringView sv_chop_by_type(StringView *self, int (*istype)(int c));
 void sv_split_by_delim(StringView *self, char delim);
 void sv_split_by_type(StringView *self, int (*istype)(int c));
+bool sv_contains_sv(const StringView *self, const StringView *str);
+bool sv_contains_str(const StringView *self, const char *str);
+bool sv_equals_sv(const StringView *self, const StringView *str);
+bool sv_equals_str(const StringView *self, const char *str);
 
 #endif

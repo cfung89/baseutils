@@ -1,11 +1,12 @@
 #include "stringview.h"
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // Creates a new StringView.
-StringView sv_new(const char *str) {
+StringView sv_create(const char *str) {
     return (StringView){
         .data = str,
         .length = strlen(str),
@@ -19,9 +20,7 @@ void sv_to_string(const StringView *self, char *output) {
 }
 
 // Utility to print a StringView.
-void sv_print(const StringView *self) {
-    printf(STRINGVIEW_FMT "\n", STRINGVIEW_ARGP(self));
-}
+void sv_print(const StringView *self) { printf(SV_FMT "\n", SV_ARGP(self)); }
 
 // Removes `n` characters from the left side of StringView.
 void sv_chop_left(StringView *self, size_t n) {
@@ -96,4 +95,34 @@ StringView sv_chop_by_type(StringView *self, int (*istype)(int c)) {
     };
     sv_chop_left(self, i + 1);
     return result;
+}
+
+bool sv_contains_sv(const StringView *self, const StringView *str);
+bool sv_contains_str(const StringView *self, const char *str);
+
+// Checks for equality of two StringViews.
+bool sv_equals_sv(const StringView *self, const StringView *str) {
+    if (self->length != str->length) {
+        return false;
+    }
+    for (size_t i = 0; i < self->length; ++i) {
+        if (self->data[i] != str->data[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Checks for StringView and standard C string equality. Assumes that the C
+// string is correctly null-terminated.
+bool sv_equals_str(const StringView *self, const char *str) {
+    if (self->length != strlen(str)) {
+        return false;
+    }
+    for (size_t i = 0; i < self->length; ++i) {
+        if (self->data[i] != str[i]) {
+            return false;
+        }
+    }
+    return true;
 }
